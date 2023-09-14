@@ -13,13 +13,13 @@ const App = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="caro-game" element={<CaroGame />} />
-        <Route path="chess" element={<Chess />} />
-        <Route path="guess-number-game" element={<GuessNumberGame />} />
-        <Route path="hangman" element={<HangMan />} />
-        <Route path="quiz-game" element={<QuizGame />} />
-        <Route path="rps-game" element={<RPSGame />} />
+        <Route exact path="/" element={<HomePage />} />
+        <Route exact path="caro-game" element={<CaroGame />} />
+        <Route exact path="chess" element={<Chess />} />
+        <Route exact path="guess-number-game" element={<GuessNumberGame />} />
+        <Route exact path="hangman" element={<HangMan />} />
+        <Route exact path="quiz-game" element={<QuizGame />} />
+        <Route exact path="rps-game" element={<RPSGame />} />
       </Routes>
       <NameModal />
     </>

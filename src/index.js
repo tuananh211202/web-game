@@ -4,14 +4,19 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthContextProvider } from './context/AuthContext';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, RouterProvider, createHashRouter } from 'react-router-dom';
+
+const router = createHashRouter([
+  {
+    path: "/*",
+    element: <App />,
+  }
+])
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <AuthContextProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </AuthContextProvider>
 );
 
