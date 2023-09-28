@@ -7,11 +7,18 @@ import HangMan from "./pages/HangMan";
 import QuizGame from "./pages/QuizGame";
 import RPSGame from "./pages/RPSGame";
 import NameModal from "./components/NameModal";
+import { ConfigProvider } from "antd";
 
 const App = () => {
 
   return (
-    <>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainerDisabled: "#DCDCDC"
+        }
+      }}
+    >
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="caro-game" element={<CaroGame />} />
@@ -22,7 +29,7 @@ const App = () => {
         <Route path="rps-game" element={<RPSGame />} />
       </Routes>
       <NameModal />
-    </>
+    </ConfigProvider>
   );
 }
 

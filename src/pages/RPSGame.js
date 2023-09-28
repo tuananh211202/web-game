@@ -4,22 +4,53 @@ import { AuthContext } from "../context/AuthContext";
 import { LiaHandPaper, LiaHandRock, LiaHandScissors, LiaHistorySolid } from "react-icons/lia";
 import { TbQuestionMark } from "react-icons/tb";
 import { BsPause, BsPlay, BsThreeDotsVertical } from "react-icons/bs";
+import { MdReplay } from "react-icons/md";
 import "../styles/RPSGame.css";
-import logo from "../images/rock-paper-scissors.png";
 
 const { Title } = Typography;
+
+const options = [ "rock", "scissors", "paper" ];
+
+const IconWithType = ({ type }) => {
+    const className = "rounded-full bg-white border-solid border-2 border-black";
+    return <>
+        {
+            type === "rock" ? <LiaHandRock size={350} className={className} color="black" /> :
+            type === "scissors" ? <LiaHandScissors  style={{ transform: 'rotate(-90deg)' }} size={350} className={className} color="black" /> :
+            type === "paper" ? <LiaHandPaper size={350} className={className} color="black" /> :
+            <TbQuestionMark size={350} className={className} />
+        }
+    </>
+}
 
 const RPSGame = () => {
     const { name } = useContext(AuthContext);
 
     const [yourName, setYourName] = useState("");
     const [option, setOption] = useState("none");
-    const [timer, setTimer] = useState(0);
-    const [isPlay, setIsPlay] = useState(false);
+    const [comOption, setComOption] = useState("none");
+    const [second, setSecond] = useState(0);
 
     const handleClick = () => {
-        setIsPlay(!isPlay);
+        setSecond(10);
+        setOption("none");
+        setComOption("none");
     }
+
+    useEffect(() => {
+        if(second > 0) {
+            const timer = setInterval(() => {
+                setSecond((prevSecond) => prevSecond - 1);
+            }, 1000);
+
+            return () => clearInterval(timer);
+        }
+        console.log("Hello");
+
+        const comOption = options[Math.floor(Math.random() * 3)];
+        console.log(comOption);
+        setComOption(comOption);
+    }, [second]);
 
     useEffect(() => {
         setYourName(name);
@@ -28,50 +59,37 @@ const RPSGame = () => {
     useEffect(() => {
         console.log(option);
     },[option]);
+    
+    useEffect(() => {
+        setComOption("none");
+    }, []);
 
     return <>
-        <Row className="w-screen h-screen relative">
+        <Row className="w-screen h-screen">
             
             {/* play area */}
             <Col span={12} style={{ backgroundColor: "#FDAC53" }} className="flex items-center">
                 <Row className="w-full">
                     <Title className="w-full flex justify-center">{yourName === "" ? "You" : yourName}</Title>
-                    <Row className="w-full flex justify-center"><TbQuestionMark size={400}/></Row>
+                    <Row className="w-full flex justify-center relative mt-5 mb-10 items-center">
+                        <IconWithType type={option} />
+                        <Row className="absolute right-0 p-5 text-3xl">
+                            {second}
+                        </Row>
+                    </Row>
                 </Row>
             </Col>
             <Col span={12} style={{ backgroundColor: "#3C9DF7" }} className="flex items-center">
                 <Row className="w-full">
                     <Title className="w-full flex justify-center">Computer</Title>
-                    <Row className="w-full flex justify-center"><TbQuestionMark size={400}/></Row>
+                    <Row className="w-full flex justify-center relative mt-5 mb-10 items-center">
+                        <IconWithType type={comOption} />
+                        <Row className="absolute left-0 p-5 text-3xl" style={{ color: "#fff" }}>
+                            {second}
+                        </Row>
+                    </Row>
                 </Row>
             </Col>
-            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} className="text-8xl">
-                {/* 10 */}
-                Bạn hòa
-            </div>
-
-            {/* logo + game mode + menu */}
-            <Row className="w-full px-10 absolute top-8 flex justify-between items-center">
-                <Row className="w-20 h-20 rounded-full bg-white">
-                    <img src={logo} className="w-full h-full rounded-full" />
-                </Row>
-                <Row className="w-40">
-                    <Select 
-                        size="large" 
-                        options={[
-                            { value: "com", label: <strong>Đấu với máy</strong> }, 
-                            { value: "human", label: <strong>Đấu với người</strong>}
-                        ]} 
-                        className="w-full"
-                        defaultValue="com"
-                    />
-                </Row>
-                <Row className="w-20 flex justify-end items-center">
-                    <Button className="rounded-full bg-transparent w-20 h-20 p-0 m-0 border-none flex items-center justify-center">
-                        <BsThreeDotsVertical size={40} color="white" />
-                    </Button>
-                </Row>
-            </Row>
 
             {/* options */}
             <Row className="w-full absolute bottom-8">
@@ -82,24 +100,28 @@ const RPSGame = () => {
                             style={{ width: "60px", height: "60px" }}
                             icon={<LiaHandRock size={40} color="black" />}
                             onClick={() => setOption("rock")}
+                            disabled={second === 0}
                         />
                         <Button 
                             className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
                             style={{ width: "60px", height: "60px" }}
                             icon={<LiaHandScissors size={40} color="black" style={{ transform: 'rotate(-90deg)' }} />}
                             onClick={() => setOption("scissors")}
+                            disabled={second === 0}
                         />
                         <Button 
                             className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
                             style={{ width: "60px", height: "60px" }}
                             icon={<LiaHandPaper size={40} color="black" />}
                             onClick={() => setOption("paper")}
+                            disabled={second === 0}
                         />
                         <Button 
                             className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
                             style={{ width: "60px", height: "60px" }}
-                            icon={isPlay ? <BsPause size={40} color="black" /> : <BsPlay size={40} color="black" />}
+                            icon={<MdReplay size={40} color="black" />}
                             onClick={handleClick}
+                            disabled={second !== 0}
                         />
                     </Row>
                     <Row>
@@ -107,13 +129,15 @@ const RPSGame = () => {
                             className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 right-hover"
                             style={{ width: "60px", height: "60px" }}
                             icon={<LiaHistorySolid size={40} color="black" />}
-                            onClick={() => setOption("history")}
+                            // onClick={() => setOption("history")}
+                            disabled={second !== 0}
                         />
                         <Button 
                             className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 right-hover" 
                             style={{ width: "60px", height: "60px" }}
                             icon={<TbQuestionMark size={40} color="black" />}
-                            onClick={() => setOption("question")}
+                            // onClick={() => setOption("question")}
+                            disabled={second !== 0}
                         />
                     </Row>
                 </Row>
