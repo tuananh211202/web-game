@@ -1,158 +1,150 @@
+import { Button, Col, FloatButton, Image, Row, Select, Typography } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { FaHandRock, FaHandPaper, FaHandScissors } from "react-icons/fa";
-import { IoMdRefresh } from "react-icons/io";
-import { Col, Pagination, Row, Table } from "antd";
-import { randomArrayOrder, randomIntNumber } from "../utils/random";
-import { checkTime } from "../utils/format-time";
+import { LiaHandPaper, LiaHandRock, LiaHandScissors, LiaHistorySolid } from "react-icons/lia";
+import { TbQuestionMark } from "react-icons/tb";
+import { BsPause, BsPlay, BsThreeDotsVertical } from "react-icons/bs";
+import { MdReplay } from "react-icons/md";
+import "../styles/RPSGame.css";
 
-const commonStyleClassName = "w-40 h-40 absolute border-solid flex items-center justify-center ";
+const { Title } = Typography;
 
-const iconList = {
-    rock: <FaHandRock color="white" size={30} />,
-    scissors: <FaHandScissors color="white" size={30} style={{ transform: 'rotate(90deg)' }} />,
-    paper: <FaHandPaper color="white" size={30}/>
-};
+const options = [ "rock", "scissors", "paper" ];
 
-const getChoosen = (index) => {
-    return Object.keys(iconList)[index][0];
+const IconWithType = ({ type }) => {
+    const className = "rounded-full bg-white border-solid border-2 border-black";
+    return <>
+        {
+            type === "rock" ? <LiaHandRock size={350} className={className} color="black" /> :
+            type === "scissors" ? <LiaHandScissors  style={{ transform: 'rotate(-90deg)' }} size={350} className={className} color="black" /> :
+            type === "paper" ? <LiaHandPaper size={350} className={className} color="black" /> :
+            <TbQuestionMark size={350} className={className} />
+        }
+    </>
 }
-
-const getTextByChoosen = (choosen) => {
-    if(choosen === "r") return " búa";
-    if(choosen === "s") return " kéo";
-    if(choosen === "p") return " bao";
-    return "";
-}
-
-const getResult = (com, per) => {
-    if(com === per) return "D";
-    if(com === "r"){
-        if(per === "s") return "L";
-        return "W";
-    }
-    if(com === "s"){
-        if(per === "p") return "L";
-        return "W";
-    }
-    if(com === "p"){
-        if(per === "r") return "L";
-        return "W";
-    }
-    return "";
-}
-
-const columns = [
-    {
-        title: 'Lựa chọn của bạn',
-        dataIndex: 'you',
-        key: 'you',
-    },
-    {
-        title: 'Lựa chọn của máy',
-        dataIndex: 'com',
-        key: 'com',
-    },
-    {
-        title: 'Kết quả',
-        dataIndex: 'result',
-        key: 'result',
-    },
-    {
-        title: 'Thời gian',
-        dataIndex: 'time',
-        key: 'time',
-    }
-]
 
 const RPSGame = () => {
     const { name } = useContext(AuthContext);
-    const [dataSource, setDataSource] = useState([]);
 
-    const [choosen, setChoosen] = useState(-1);
-    const [message, setMessage] = useState("chưa chọn gì cả!");
-    const [computerMessage, setComputerMessage] = useState("chờ");
-    const [order, setOrder] = useState([0,1,2]);
-    const [time, setTime] = useState('');
+    const [yourName, setYourName] = useState("");
+    const [option, setOption] = useState("none");
+    const [comOption, setComOption] = useState("none");
+    const [second, setSecond] = useState(0);
+
+    const handleClick = () => {
+        setSecond(10);
+        setOption("none");
+        setComOption("none");
+    }
 
     useEffect(() => {
-        if(choosen !== -1){
-            const match = {
-                key: dataSource.length ? "" + (parseInt(dataSource[dataSource.length - 1].key) + 1) : '0',
-                you: 'Bạn chọn ' + getTextByChoosen(getChoosen(choosen)),
-                com: 'Máy ' + computerMessage,
-                result: 'Bạn ' + message,
-                time: time
-            };
-            setDataSource([...dataSource, match]);
+        if(second > 0) {
+            const timer = setInterval(() => {
+                setSecond((prevSecond) => prevSecond - 1);
+            }, 1000);
+
+            return () => clearInterval(timer);
         }
-        setChoosen(-1);
-    }, [order]);
+        console.log("Hello");
+
+        const comOption = options[Math.floor(Math.random() * 3)];
+        console.log(comOption);
+        setComOption(comOption);
+    }, [second]);
 
     useEffect(() => {
-        const computerChoosen = randomIntNumber(0,2);
-        if(choosen === -1){
-            setMessage("chưa chọn gì cả!");
-            setComputerMessage("chờ");
-        }else{
-            const now = new Date();
-            const h = checkTime(now.getHours());
-            const m = checkTime(now.getMinutes());
-            const s = checkTime(now.getSeconds());
-            setTime(h + ':' + m + ':' + s);
+        setYourName(name);
+    }, [name]);
+
+    useEffect(() => {
+        console.log(option);
+    },[option]);
+    
+    useEffect(() => {
+        setComOption("none");
+    }, []);
+
+    return <>
+        <Row className="w-screen h-screen">
             
-            const res = getResult(getChoosen(computerChoosen), getChoosen(choosen));
-            setComputerMessage('chọn ' + getTextByChoosen(getChoosen(computerChoosen)));
-            if(res === "D") setMessage("hòa!");
-            else if(res === "W") setMessage("thắng!");
-            else if(res === "L") setMessage("thua!");
-        }
-    },[choosen]);
+            {/* play area */}
+            <Col span={12} style={{ backgroundColor: "#FDAC53" }} className="flex items-center">
+                <Row className="w-full">
+                    <Title className="w-full flex justify-center">{yourName === "" ? "You" : yourName}</Title>
+                    <Row className="w-full flex justify-center relative mt-5 mb-10 items-center">
+                        <IconWithType type={option} />
+                        <Row className="absolute right-0 p-5 text-3xl">
+                            {second}
+                        </Row>
+                    </Row>
+                </Row>
+            </Col>
+            <Col span={12} style={{ backgroundColor: "#3C9DF7" }} className="flex items-center">
+                <Row className="w-full">
+                    <Title className="w-full flex justify-center">Computer</Title>
+                    <Row className="w-full flex justify-center relative mt-5 mb-10 items-center">
+                        <IconWithType type={comOption} />
+                        <Row className="absolute left-0 p-5 text-3xl" style={{ color: "#fff" }}>
+                            {second}
+                        </Row>
+                    </Row>
+                </Row>
+            </Col>
 
-    return (
-        <>
-            <Row>
-                <Col span={8}>
-                    <div className="w-80 h-80 rounded-full relative m-10">
-                        <button 
-                            disabled={choosen !== -1}
-                            className={commonStyleClassName + "rounded-tl-full top-0 left-0 border-b-4 border-r-4 bg-sky-600 hover:bg-sky-700"}
-                            onClick={() => setChoosen(order[0])}
-                        >
-                            {Object.values(iconList)[order[0]]}
-                        </button>
-                        <button 
-                            disabled={choosen !== -1}
-                            className={commonStyleClassName + "rounded-tr-full top-0 left-40 border-b-4 border-l-4 bg-red-600 hover:bg-red-700"}
-                            onClick={() => setChoosen(order[1])}
-                        >
-                            {Object.values(iconList)[order[1]]}
-                        </button>
-                        <button 
-                            disabled={choosen !== -1}
-                            className={commonStyleClassName + "rounded-bl-full top-40 left-0 border-t-4 border-r-4 bg-orange-600 hover:bg-orange-700"}
-                            onClick={() => setChoosen(order[2])}
-                        >
-                            {Object.values(iconList)[order[2]]}
-                        </button>
-                        <button 
-                            className={commonStyleClassName + "rounded-br-full top-40 left-40 border-t-4 border-l-4 bg-neutral-500 hover:bg-neutral-600"}
-                            onClick={() => setOrder(randomArrayOrder(order))}
-                        >
-                            <IoMdRefresh color="white" size={30} />
-                        </button>
-                    </div>
-                </Col>
-                <Col span={16} className="my-32">
-                    <Row className="w-full text-2xl py-2">Chọn búa, kéo hoặc bao để biết bạn thắng hay thua:</Row>
-                    <Row className="w-full text-base">{choosen === -1 ? "" : "Bấm tải lại để chơi ván mới"}</Row>
-                    <Row className="w-full text-4xl py-2 text-red-500">Máy {computerMessage}, Bạn {message}</Row>
-                </Col>
+            {/* options */}
+            <Row className="w-full absolute bottom-8">
+                <Row className="w-full flex justify-between px-5">
+                    <Row>
+                        <Button 
+                            className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
+                            style={{ width: "60px", height: "60px" }}
+                            icon={<LiaHandRock size={40} color="black" />}
+                            onClick={() => setOption("rock")}
+                            disabled={second === 0}
+                        />
+                        <Button 
+                            className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
+                            style={{ width: "60px", height: "60px" }}
+                            icon={<LiaHandScissors size={40} color="black" style={{ transform: 'rotate(-90deg)' }} />}
+                            onClick={() => setOption("scissors")}
+                            disabled={second === 0}
+                        />
+                        <Button 
+                            className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
+                            style={{ width: "60px", height: "60px" }}
+                            icon={<LiaHandPaper size={40} color="black" />}
+                            onClick={() => setOption("paper")}
+                            disabled={second === 0}
+                        />
+                        <Button 
+                            className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 left-hover" 
+                            style={{ width: "60px", height: "60px" }}
+                            icon={<MdReplay size={40} color="black" />}
+                            onClick={handleClick}
+                            disabled={second !== 0}
+                        />
+                    </Row>
+                    <Row>
+                        <Button 
+                            className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 right-hover"
+                            style={{ width: "60px", height: "60px" }}
+                            icon={<LiaHistorySolid size={40} color="black" />}
+                            // onClick={() => setOption("history")}
+                            disabled={second !== 0}
+                        />
+                        <Button 
+                            className="rounded-full p-0 m-0 bg-white flex items-center justify-center mx-5 right-hover" 
+                            style={{ width: "60px", height: "60px" }}
+                            icon={<TbQuestionMark size={40} color="black" />}
+                            // onClick={() => setOption("question")}
+                            disabled={second !== 0}
+                        />
+                    </Row>
+                </Row>
             </Row>
-            <Row className="text-base px-10 pb-5">Lịch sử thi đấu của &nbsp;<strong className="text-red-500">{name}</strong>:</Row>
-            <Table className="px-10" bordered size="small" columns={columns} dataSource={dataSource} pagination={<Pagination defaultPageSize={5} />} />
-        </>
-    );
+
+        </Row>
+    </>
 };
 
 export default RPSGame;
