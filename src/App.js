@@ -8,6 +8,7 @@ import QuizGame from "./pages/QuizGame";
 import RPSGame from "./pages/RPSGame";
 import NameModal from "./components/NameModal";
 import { ConfigProvider } from "antd";
+import DigitalClockPage from "./pages/DigitalClock";
 
 const App = () => {
 
@@ -27,6 +28,7 @@ const App = () => {
         <Route exact path="hangman" element={<HangMan />} />
         <Route exact path="quiz-game" element={<QuizGame />} />
         <Route exact path="rps-game" element={<RPSGame />} />
+        <Route exact path="digital-clock" element={<DigitalClockPage />} />
       </Routes>
       <NameModal />
     </ConfigProvider>
